@@ -39,14 +39,38 @@ module v810
   output logic              halted
 );
 
-  // -------- Fetch --------
-  logic [ALEN-1:0] pc;
-  logic [15:0]     instr_halfword;
-  logic            fetch_advance;
-  logic [2:0]      fetch_advance_by;
-  logic            fetch_branch;
-  logic [ALEN-1:0] fetch_branch_target;
+  // -------- Signal declarations (all declared up front) --------
 
+  // Fetch
+  logic [ALEN-1:0]    pc;
+  logic [15:0]        instr_halfword;
+  logic               fetch_advance;
+  logic [2:0]         fetch_advance_by;
+  logic               fetch_branch;
+  logic [ALEN-1:0]    fetch_branch_target;
+
+  // Decode
+  logic               dec_valid;
+  fmt_e               dec_fmt;
+  alu_op_e            dec_alu_op;
+  logic [GPR_IDX-1:0] dec_rs_a_addr;
+  logic [GPR_IDX-1:0] dec_rs_b_addr;
+  logic [GPR_IDX-1:0] dec_rd_addr;
+  logic               dec_rd_we;
+  logic [2:0]         dec_instr_len;
+
+  // Register-file read data
+  logic [XLEN-1:0]    rs_a_data;
+  logic [XLEN-1:0]    rs_b_data;
+
+  // ALU
+  logic [XLEN-1:0]    alu_result;
+  logic               alu_flag_z;
+  logic               alu_flag_s;
+  logic               alu_flag_ov;
+  logic               alu_flag_cy;
+
+  // -------- Fetch --------
   v810_fetch u_fetch (
     .clk            (clk),
     .rst_n          (rst_n),
@@ -64,15 +88,6 @@ module v810
   );
 
   // -------- Decode --------
-  logic               dec_valid;
-  fmt_e               dec_fmt;
-  alu_op_e            dec_alu_op;
-  logic [GPR_IDX-1:0] dec_rs_a_addr;
-  logic [GPR_IDX-1:0] dec_rs_b_addr;
-  logic [GPR_IDX-1:0] dec_rd_addr;
-  logic               dec_rd_we;
-  logic [2:0]         dec_instr_len;
-
   v810_decoder u_decode (
     .instr_halfword (instr_halfword),
     .valid          (dec_valid),
@@ -86,9 +101,6 @@ module v810
   );
 
   // -------- Register file --------
-  logic [XLEN-1:0] rs_a_data;
-  logic [XLEN-1:0] rs_b_data;
-
   register_file u_regs (
     .clk     (clk),
     .rst_n   (rst_n),
@@ -102,12 +114,6 @@ module v810
   );
 
   // -------- ALU --------
-  logic [XLEN-1:0] alu_result;
-  logic            alu_flag_z;
-  logic            alu_flag_s;
-  logic            alu_flag_ov;
-  logic            alu_flag_cy;
-
   v810_alu u_alu (
     .op      (dec_alu_op),
     .a       (rs_a_data),
