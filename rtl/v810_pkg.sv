@@ -16,8 +16,6 @@ package v810_pkg;
   localparam int SR_IDX  = $clog2(NSR);      // 5 bits
 
   // Instruction format categories per NEC V810 family manual.
-  // Used by the decoder as an intermediate classification between raw opcode
-  // and specific operation. Values are internal to this core only.
   typedef enum logic [2:0] {
     FMT_I   = 3'd0,  // reg/reg,         16-bit
     FMT_II  = 3'd1,  // imm5/reg,        16-bit
@@ -28,9 +26,7 @@ package v810_pkg;
     FMT_VII = 3'd6   // FPU / extended,  32-bit
   } fmt_e;
 
-  // PSW flag bit positions. Exact positions to be verified against NEC manual;
-  // these parameters exist so that downstream code references symbols rather
-  // than magic numbers and can be corrected in one place.
+  // PSW flag bit positions (to be verified against NEC manual).
   localparam int PSW_Z  = 0;   // zero
   localparam int PSW_S  = 1;   // sign
   localparam int PSW_OV = 2;   // overflow
@@ -38,5 +34,20 @@ package v810_pkg;
   localparam int PSW_ID = 12;  // interrupt disable  (TODO: verify)
   localparam int PSW_EP = 14;  // exception pending  (TODO: verify)
   localparam int PSW_NP = 15;  // NMI pending        (TODO: verify)
+
+  // ALU operation selector. Internal to the core; the decoder maps from
+  // instruction opcodes to these values. See docs/adr/0001-alu-design.md.
+  typedef enum logic [3:0] {
+    ALU_ADD = 4'd0,  // result = a + b
+    ALU_SUB = 4'd1,  // result = a - b  (also used for CMP; writeback suppressed)
+    ALU_AND = 4'd2,  // result = a & b
+    ALU_OR  = 4'd3,  // result = a | b
+    ALU_XOR = 4'd4,  // result = a ^ b
+    ALU_NOT = 4'd5,  // result = ~b  (unary)
+    ALU_SHL = 4'd6,  // result = a << b[4:0]
+    ALU_SHR = 4'd7,  // result = a >> b[4:0]  (logical)
+    ALU_SAR = 4'd8,  // result = $signed(a) >>> b[4:0]  (arithmetic)
+    ALU_MOV = 4'd9   // result = b  (passthrough for register moves)
+  } alu_op_e;
 
 endpackage : v810_pkg

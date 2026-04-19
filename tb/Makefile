@@ -3,30 +3,46 @@
 # Requires Verilator 5.x (for --binary + --timing).
 #
 # Usage:
-#   make <testname>       e.g. make register_file
+#   make all              build and run every testbench
+#   make register_file    run only the register file testbench
+#   make v810_alu         run only the ALU testbench
 #   make lint             lint all RTL
 #   make clean            remove build artifacts
 
 VERILATOR ?= verilator
 RTL_DIR   := ../rtl
 TB_DIR    := .
-BUILD_DIR := obj_dir
 
 VFLAGS_COMMON := --binary --timing -Wall -Wno-UNUSED
-RTL_SRCS      := $(RTL_DIR)/v810_pkg.sv $(RTL_DIR)/register_file.sv $(RTL_DIR)/v810.sv
+RTL_SRCS      := $(RTL_DIR)/v810_pkg.sv \
+                 $(RTL_DIR)/v810_alu.sv \
+                 $(RTL_DIR)/register_file.sv \
+                 $(RTL_DIR)/v810.sv
 
-.PHONY: register_file lint clean
+.PHONY: all register_file v810_alu lint clean
+
+all: register_file v810_alu
 
 register_file:
 	$(VERILATOR) $(VFLAGS_COMMON) \
 	    $(RTL_DIR)/v810_pkg.sv \
 	    $(RTL_DIR)/register_file.sv \
 	    $(TB_DIR)/tb_register_file.sv \
-	    --top-module tb_register_file
-	./$(BUILD_DIR)/Vtb_register_file
+	    --top-module tb_register_file \
+	    -Mdir obj_dir_regfile
+	./obj_dir_regfile/Vtb_register_file
+
+v810_alu:
+	$(VERILATOR) $(VFLAGS_COMMON) \
+	    $(RTL_DIR)/v810_pkg.sv \
+	    $(RTL_DIR)/v810_alu.sv \
+	    $(TB_DIR)/tb_v810_alu.sv \
+	    --top-module tb_v810_alu \
+	    -Mdir obj_dir_alu
+	./obj_dir_alu/Vtb_v810_alu
 
 lint:
 	$(VERILATOR) --lint-only -Wall -Wno-UNUSED $(RTL_SRCS)
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf obj_dir obj_dir_regfile obj_dir_alu

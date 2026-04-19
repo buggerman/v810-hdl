@@ -2,7 +2,7 @@
 
 > Realistic target: **12–18 months to a verified standalone V810 core** for a dedicated developer with prior CPU HDL experience.
 
-## Phase 0 — Specification & test harness (current)
+## Phase 0 — Specification & test harness
 
 **Goal**: know exactly what we're building and be able to run test ROMs before writing RTL.
 
@@ -14,16 +14,18 @@
 - [x] Choose license (Apache-2.0)
 - [x] Set up CI skeleton (GitHub Actions running Verilator lint + testbench)
 
-## Phase 1 — Skeleton CPU
+## Phase 1 — Skeleton CPU (current)
 
 **Goal**: register file, fetch/decode, simplest ALU instructions running.
 
 - [x] Top-level module, clock/reset, memory port stubs (`rtl/v810.sv`)
 - [x] Register file (32×32, r0 hardwired) (`rtl/register_file.sv`)
 - [x] Register file testbench (`tb/tb_register_file.sv`)
+- [x] Single-cycle ALU: ADD, SUB, AND, OR, XOR, NOT, SHL, SHR, SAR, MOV (`rtl/v810_alu.sv`)
+- [x] ALU testbench covering flag semantics and edge cases (`tb/tb_v810_alu.sv`)
+- [x] ADR 0001: ALU scope and MUL/DIV separation decision
 - [ ] Instruction fetch (no pipeline yet)
-- [ ] Decoder for arithmetic + logical register-register instructions (Format I)
-- [ ] Single-cycle ALU
+- [ ] Decoder for Format I register-register instructions
 - [ ] First passing end-to-end instruction trace (fetch → decode → execute → writeback)
 
 ## Phase 2 — Full integer ISA
@@ -32,7 +34,8 @@
 - [ ] All branches + condition codes (Format III, IV)
 - [ ] Immediate-form instructions (Format II, V)
 - [ ] Sign/zero extension correct for all widths
-- [ ] PSW and condition-code flags
+- [ ] PSW and condition-code flags wired to the pipeline
+- [ ] `v810_muldiv` multi-cycle unit (separate from ALU per ADR 0001)
 - [ ] Sufficient test coverage for each instruction
 
 ## Phase 3 — Pipeline

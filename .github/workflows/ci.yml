@@ -21,6 +21,7 @@ jobs:
         run: |
           verilator --lint-only -Wall -Wno-UNUSED \
             rtl/v810_pkg.sv \
+            rtl/v810_alu.sv \
             rtl/register_file.sv \
             rtl/v810.sv
 
@@ -37,3 +38,17 @@ jobs:
       - name: Run testbench
         working-directory: tb
         run: make register_file
+
+  test-v810-alu:
+    name: ALU testbench
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilator + build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator make
+          verilator --version
+      - name: Run testbench
+        working-directory: tb
+        run: make v810_alu
