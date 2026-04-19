@@ -4,10 +4,8 @@
 
 ## Phase 0 — Specification & test harness
 
-**Goal**: know exactly what we're building and be able to run test ROMs before writing RTL.
-
 - [ ] Read NEC V810 user manual end-to-end, extract instruction encoding to `docs/ISA.md`
-- [x] Draft `docs/ISA.md` format and verification checklist (values pending manual verification)
+- [x] Draft `docs/ISA.md` format and verification checklist
 - [ ] Build `v810-gcc` toolchain locally, confirm it produces working binaries
 - [ ] Build MAME with V810 CPU enabled; confirm we can capture per-instruction-retire traces
 - [ ] Write a trivial V810 C program ("hello, ADD"), run under MAME, capture golden trace
@@ -16,26 +14,31 @@
 
 ## Phase 1 — Skeleton CPU (current)
 
-**Goal**: register file, fetch/decode, simplest ALU instructions running.
-
-- [x] Top-level module, clock/reset, memory port stubs (`rtl/v810.sv`)
-- [x] Register file (32×32, r0 hardwired) (`rtl/register_file.sv`)
-- [x] Register file testbench (`tb/tb_register_file.sv`)
-- [x] Single-cycle ALU: ADD, SUB, AND, OR, XOR, NOT, SHL, SHR, SAR, MOV (`rtl/v810_alu.sv`)
-- [x] ALU testbench covering flag semantics and edge cases (`tb/tb_v810_alu.sv`)
+- [x] Top-level module, clock/reset, memory port stubs
+- [x] Register file (32×32, r0 hardwired)
+- [x] Register file testbench
+- [x] Single-cycle ALU: ADD, SUB, AND, OR, XOR, NOT, SHL, SHR, SAR, MOV
+- [x] ALU testbench covering flag semantics and edge cases
 - [x] ADR 0001: ALU scope and MUL/DIV separation decision
-- [ ] Instruction fetch (no pipeline yet)
-- [ ] Decoder for Format I register-register instructions
-- [ ] First passing end-to-end instruction trace (fetch → decode → execute → writeback)
+- [x] Instruction fetch unit (32-bit aligned, halfword-select via `pc[1]`)
+- [x] Decoder for Format I register-register instructions (placeholder opcodes)
+- [x] Top-level wiring: fetch → decode → regfile → ALU → writeback
+- [x] First passing end-to-end integration test (3-instruction program)
+- [x] ADR 0002: single-cycle microarchitecture + aligned-fetch decision
+- [ ] Second integration test covering all 10 Format I ALU ops
+- [ ] Verify Format I opcode hex values against NEC manual
 
 ## Phase 2 — Full integer ISA
 
-- [ ] All loads/stores with displacement (Format VI)
-- [ ] All branches + condition codes (Format III, IV)
-- [ ] Immediate-form instructions (Format II, V)
+- [ ] 32-bit instruction fetch with halfword-boundary spanning
+- [ ] Format II: imm5 instructions (incl. MOV imm5, SHL imm5, LDSR, STSR, SEI, CLI, TRAP, RETI, HALT)
+- [ ] Format V: imm16 instructions (MOVEA, MOVHI, ADDI, ORI, ANDI, XORI)
+- [ ] Format VI: loads/stores with displacement
+- [ ] Format III: conditional branches, 16 condition codes
+- [ ] Format IV: JMP/JAL
+- [ ] `v810_muldiv` multi-cycle unit (separate from ALU per ADR 0001)
 - [ ] Sign/zero extension correct for all widths
 - [ ] PSW and condition-code flags wired to the pipeline
-- [ ] `v810_muldiv` multi-cycle unit (separate from ALU per ADR 0001)
 - [ ] Sufficient test coverage for each instruction
 
 ## Phase 3 — Pipeline

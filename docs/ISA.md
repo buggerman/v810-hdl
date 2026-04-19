@@ -1,6 +1,8 @@
 # V810 Instruction Set Reference
 
 > **Status**: draft, pending verification against the authoritative NEC V810 Family User Manual (`u10082ej1v0um00.pdf`). Anything in this document should be treated as a working hypothesis until a specific opcode encoding has been checked against the manual. The verification checklist at the bottom tracks open items.
+>
+> **Current placeholder opcodes** live in `rtl/v810_decoder.sv` as `localparam`s prefixed `OP_*_REG`. They are internally consistent with `tb/tb_v810_top.sv`, so the Phase 1 integration test is correct by construction. Real V810 binaries will require each value to be reconciled with the manual.
 
 ## Overview
 
@@ -54,7 +56,7 @@ Flag bit positions to be validated against manual. Expected set:
 | opcode |  reg2  |  reg1  |
 ```
 
-Arithmetic / logical / data-movement register-register operations (MOV, ADD, SUB, CMP, OR, AND, XOR, NOT, MUL, MULU, DIV, DIVU, SHL, SHR, SAR, JMP-via-register, …).
+Arithmetic / logical / data-movement register-register operations (MOV, ADD, SUB, CMP, OR, AND, XOR, NOT, MUL, MULU, DIV, DIVU, SHL, SHR, SAR, JMP-via-register, …). Semantic: "OP reg1, reg2" means `reg2 <- f(reg2, reg1)`.
 
 ### Format II — imm5/reg, 16 bits
 
@@ -144,7 +146,7 @@ LDSR, STSR, RETI, TRAP, HALT, SEI, CLI, CAXI.
 
 Items below must be verified against the NEC manual before the decoder is considered trustworthy. Each item becomes a GitHub issue with label `isa-verify`.
 
-- [ ] Exact opcode hex values for every Format I, II, III, IV, V, VI, VII instruction
+- [ ] Exact opcode hex values for every Format I, II, III, IV, V, VI, VII instruction (**currently placeholders in `rtl/v810_decoder.sv`**)
 - [ ] Exact bit width and position of Format VII sub-opcode
 - [ ] PSW bit positions (Z, S, OV, CY, ID, EP, NP, AE)
 - [ ] FPU exception flag encoding and interaction with PSW
@@ -156,5 +158,6 @@ Items below must be verified against the NEC manual before the decoder is consid
 - [ ] Branch target alignment and exception on misalignment
 - [ ] Exception vector addresses
 - [ ] Cache control behavior on uPD70732 variant (deferred; not in v1 scope)
+- [ ] SUB carry/borrow polarity (current implementation assumes CY=1 on borrow; see ADR 0001)
 
 Source of truth: NEC V810 Family User Manual (`u10082ej1v0um00.pdf`). All uncertainty in this document resolves against that document.
