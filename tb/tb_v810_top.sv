@@ -2,10 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 // Top-level integration testbench for the V810 Phase 1 CPU.
-//   preload:  r1=10, r2=20
-//   PC=0:  ADD r1, r2   ; r2 <- r2 + r1   = 30
-//   PC=2:  MOV r2, r3   ; r3 <- r2        = 30
-//   PC=4:  SUB r3, r4   ; r4 <- r4 - r3   = 0xFFFFFFE2
+//
+// This test deliberately avoids any hierarchical-reference preload of the
+// DUT's register file. All initial values are constructed by the program
+// itself: NOT r0 gives ~0 = 0xFFFFFFFF in any destination register, which
+// seeds enough state for meaningful end-state checks.
+//
+// Program:
+//   PC=0:  NOT r0, r1    ; r1 <- ~0        = 0xFFFFFFFF
+//   PC=2:  MOV r1, r2    ; r2 <- r1        = 0xFFFFFFFF
+//   PC=4:  ADD r1, r2    ; r2 <- r2 + r1   = 0xFFFFFFFE
+//   PC=6:  NOP           ; MOV r0, r0      (opcode 0, reg2=0, reg1=0)
 
 `timescale 1ns/1ps
 
@@ -56,9 +63,10 @@ module tb_v810_top;
     .halted     (halted)
   );
 
+  // Opcode values must match rtl/v810_decoder.sv placeholders.
   localparam logic [5:0] OP_MOV_REG = 6'b000000;
   localparam logic [5:0] OP_ADD_REG = 6'b000001;
-  localparam logic [5:0] OP_SUB_REG = 6'b000010;
+  localparam logic [5:0] OP_NOT_REG = 6'b001111;
 
   function automatic logic [15:0] fmt1(input logic [5:0] op,
                                        input logic [4:0] reg2,
@@ -76,34 +84,34 @@ module tb_v810_top;
                        input logic [XLEN-1:0] got,
                        input logic [XLEN-1:0] expected);
     if (got !== expected) begin
-      $display("FAIL %-24s  got %08h  expected %08h", name, got, expected);
+      $display("FAIL %-26s  got %08h  expected %08h", name, got, expected);
       errors++;
     end else begin
-      $display("PASS %-24s  %08h", name, got);
+      $display("PASS %-26s  %08h", name, got);
     end
   endtask
 
   initial begin
+    // Zero-fill the instruction ROM (zero == MOV r0, r0 == NOP)
     for (int i = 0; i < 256; i++) imem[i] = 32'h0000_0000;
 
-    imem[0] = {fmt1(OP_MOV_REG, 5'd3, 5'd2),
+    // Word 0: low half = PC 0 (NOT r0,r1), high half = PC 2 (MOV r1,r2)
+    imem[0] = {fmt1(OP_MOV_REG, 5'd2, 5'd1),
+               fmt1(OP_NOT_REG, 5'd1, 5'd0)};
+
+    // Word 1: low half = PC 4 (ADD r1,r2), high half = PC 6 (NOP)
+    imem[1] = {16'h0000,
                fmt1(OP_ADD_REG, 5'd2, 5'd1)};
 
-    imem[1] = {16'h0000,
-               fmt1(OP_SUB_REG, 5'd4, 5'd3)};
-
+    // Release reset
     #20 rst_n = 1'b1;
 
-    dut.u_regs.regs[1] = 32'd10;
-    dut.u_regs.regs[2] = 32'd20;
+    // Let the CPU execute at least four instructions with slack
+    repeat (8) @(posedge clk);
 
-    repeat (6) @(posedge clk);
-
-    check("r1 unchanged",   reg_peek(1), 32'd10);
-    check("r2 after ADD",   reg_peek(2), 32'd30);
-    check("r3 after MOV",   reg_peek(3), 32'd30);
-    check("r4 after SUB",   reg_peek(4), 32'hFFFF_FFE2);
-    check("r0 hardwired 0", reg_peek(0), 32'd0);
+    check("r0 hardwired zero",    reg_peek(0), 32'h0000_0000);
+    check("r1 after NOT r0",      reg_peek(1), 32'hFFFF_FFFF);
+    check("r2 after ADD r1 (ov)", reg_peek(2), 32'hFFFF_FFFE);
 
     if (errors == 0) begin
       $display("ALL TOP-LEVEL INTEGRATION TESTS PASSED");
