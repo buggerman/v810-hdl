@@ -1,0 +1,38 @@
+# Simulation
+*.vvp
+*.vcd
+*.fst
+*.wlf
+wlft*
+transcript
+simulation/modelsim/
+simulation/questa/
+simulation/verilator/
+obj_dir/
+work/
+*.log
+
+# Build artifacts
+build/
+*.o
+*.elf
+*.bin
+*.hex
+!tests/reference/**/*.bin
+!tests/reference/**/*.hex
+
+# Synthesis sandboxes (if any)
+synth/db/
+synth/incremental_db/
+synth/output_files/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+# Local notes
+NOTES_LOCAL.md
+.env
