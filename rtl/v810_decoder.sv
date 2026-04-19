@@ -4,23 +4,11 @@
 // V810 instruction decoder (Phase 1 baseline).
 //
 // Scope: Format I register-register arithmetic, logical, shift, and move ops.
-// Formats II–VII are Phase 2 work.
 //
-// WARNING: OPCODE HEX VALUES ARE PLACEHOLDERS.
-//   The exact 6-bit opcode values below have not been verified against the
-//   NEC V810 Family User Manual. They are internally consistent — the
-//   testbench uses the same definitions via `v810_isa_ops.svh` — so the
-//   CPU is self-consistent for synthetic tests. Before running real V810
-//   binaries (homebrew, BIOS, MAME traces), each value below must be
-//   cross-checked against the NEC manual.
-//   Tracked as item #1 in docs/ISA.md verification checklist.
-//
-// Format I halfword layout (NEC V810 convention):
-//   [15:10] opcode (6 bits)
-//   [ 9:5 ] reg2   (destination and first source)
-//   [ 4:0 ] reg1   (second source)
-//
-// Semantic: "OP reg1, reg2"  means  reg2 <- f(reg2, reg1).
+// WARNING: OPCODE HEX VALUES ARE PLACEHOLDERS. See file header prose in the
+// previous revision and docs/ISA.md verification checklist.
+
+`timescale 1ns/1ps
 
 module v810_decoder
   import v810_pkg::*;
@@ -30,14 +18,13 @@ module v810_decoder
   output logic               valid,
   output fmt_e               fmt,
   output alu_op_e            alu_op,
-  output logic [GPR_IDX-1:0] rs_a_addr,   // ALU operand A (= reg2)
-  output logic [GPR_IDX-1:0] rs_b_addr,   // ALU operand B (= reg1)
-  output logic [GPR_IDX-1:0] rd_addr,     // destination    (= reg2)
+  output logic [GPR_IDX-1:0] rs_a_addr,
+  output logic [GPR_IDX-1:0] rs_b_addr,
+  output logic [GPR_IDX-1:0] rd_addr,
   output logic               rd_we,
-  output logic [2:0]         instr_len    // 2 = 16-bit instruction (Format I)
+  output logic [2:0]         instr_len
 );
 
-  // Placeholder opcode values. See WARNING above.
   localparam logic [5:0] OP_MOV_REG = 6'b000000;
   localparam logic [5:0] OP_ADD_REG = 6'b000001;
   localparam logic [5:0] OP_SUB_REG = 6'b000010;

@@ -5,6 +5,8 @@
 // Opcode values are intentionally NOT declared here yet — they will be added
 // in a dedicated `v810_isa_pkg` once docs/ISA.md verification items are cleared.
 
+`timescale 1ns/1ps
+
 package v810_pkg;
 
   // Architectural widths
@@ -27,27 +29,27 @@ package v810_pkg;
   } fmt_e;
 
   // PSW flag bit positions (to be verified against NEC manual).
-  localparam int PSW_Z  = 0;   // zero
-  localparam int PSW_S  = 1;   // sign
-  localparam int PSW_OV = 2;   // overflow
-  localparam int PSW_CY = 3;   // carry
-  localparam int PSW_ID = 12;  // interrupt disable  (TODO: verify)
-  localparam int PSW_EP = 14;  // exception pending  (TODO: verify)
-  localparam int PSW_NP = 15;  // NMI pending        (TODO: verify)
+  localparam int PSW_Z  = 0;
+  localparam int PSW_S  = 1;
+  localparam int PSW_OV = 2;
+  localparam int PSW_CY = 3;
+  localparam int PSW_ID = 12;
+  localparam int PSW_EP = 14;
+  localparam int PSW_NP = 15;
 
   // ALU operation selector. Internal to the core; the decoder maps from
   // instruction opcodes to these values. See docs/adr/0001-alu-design.md.
   typedef enum logic [3:0] {
-    ALU_ADD = 4'd0,  // result = a + b
-    ALU_SUB = 4'd1,  // result = a - b  (also used for CMP; writeback suppressed)
-    ALU_AND = 4'd2,  // result = a & b
-    ALU_OR  = 4'd3,  // result = a | b
-    ALU_XOR = 4'd4,  // result = a ^ b
-    ALU_NOT = 4'd5,  // result = ~b  (unary)
-    ALU_SHL = 4'd6,  // result = a << b[4:0]
-    ALU_SHR = 4'd7,  // result = a >> b[4:0]  (logical)
-    ALU_SAR = 4'd8,  // result = $signed(a) >>> b[4:0]  (arithmetic)
-    ALU_MOV = 4'd9   // result = b  (passthrough for register moves)
+    ALU_ADD = 4'd0,
+    ALU_SUB = 4'd1,
+    ALU_AND = 4'd2,
+    ALU_OR  = 4'd3,
+    ALU_XOR = 4'd4,
+    ALU_NOT = 4'd5,
+    ALU_SHL = 4'd6,
+    ALU_SHR = 4'd7,
+    ALU_SAR = 4'd8,
+    ALU_MOV = 4'd9
   } alu_op_e;
 
 endpackage : v810_pkg
