@@ -23,7 +23,7 @@ Primary synthesis target is the Intel Cyclone V (DE10-Nano) to fit the MiSTer ec
 - **No vendor IP** in the core. FIFOs, register files, ALU, FPU are portable.
 - **Cycle-accurate where it matters** (pipeline hazards, interlocks, bit-string ops).
 - **Test-driven.** Every feature gets a corresponding C-language test ROM compiled with [`v810-gcc`](https://github.com/jbrandwood/v810-gcc), and a testbench that compares execution traces against MAME's V810 reference.
-- **Permissively licensed** (TBD; likely MIT or Apache-2.0 for maximum reuse) so consumers can integrate into GPL cores like MiSTer without friction. License decision pending — see [issue #1] when filed.
+- **Permissively licensed** under Apache-2.0 so consumers can integrate into GPL-3.0 MiSTer cores (and most other projects) without friction.
 
 ## Spec reference
 
@@ -46,6 +46,10 @@ If you have HDL experience, CPU design background, or V810 reverse-engineering k
 - FPU design (IEEE 754 single-precision, V810 subset)
 - V810 toolchain / homebrew experience (for writing tests)
 
+All contributions are accepted under Apache-2.0 per the [`LICENSE`](LICENSE) file. By submitting a pull request, you agree your contribution is licensed accordingly (see section 5 of the license).
+
 ## License
 
-TBD. Intended to be permissive (MIT or Apache-2.0).
+Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+
+The Apache-2.0 license grants a patent license from contributors and includes patent retaliation — standard practice for open silicon IP (RISC-V cores, OpenTitan, lowRISC, etc.).

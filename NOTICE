@@ -1,0 +1,14 @@
+v810-hdl
+Copyright 2026 v810-hdl contributors
+
+This product includes software developed as part of the v810-hdl project,
+an open-source SystemVerilog implementation of the NEC V810 CPU.
+
+This project is not affiliated with NEC Corporation. "V810" refers to the
+publicly-documented NEC V810 family microprocessor architecture and is used
+here solely to describe the subject of the implementation.
+
+Reference emulators (MAME, Mednafen) were consulted as behavioral oracles
+during development. No source code from those projects was copied into this
+work; all HDL is independently authored from the NEC V810 family user manual
+and related public specifications.
