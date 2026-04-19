@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Verilator lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator
+          verilator --version
+      - name: Lint RTL
+        run: |
+          verilator --lint-only -Wall -Wno-UNUSED \
+            rtl/v810_pkg.sv \
+            rtl/register_file.sv \
+            rtl/v810.sv
+
+  test-register-file:
+    name: Register file testbench
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilator + build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator make
+          verilator --version
+      - name: Run testbench
+        working-directory: tb
+        run: make register_file

@@ -7,28 +7,30 @@
 **Goal**: know exactly what we're building and be able to run test ROMs before writing RTL.
 
 - [ ] Read NEC V810 user manual end-to-end, extract instruction encoding to `docs/ISA.md`
+- [x] Draft `docs/ISA.md` format and verification checklist (values pending manual verification)
 - [ ] Build `v810-gcc` toolchain locally, confirm it produces working binaries
 - [ ] Build MAME with V810 CPU enabled; confirm we can capture per-instruction-retire traces
 - [ ] Write a trivial V810 C program ("hello, ADD"), run under MAME, capture golden trace
-- [ ] Choose license (MIT vs Apache-2.0)
-- [ ] Set up CI skeleton (GitHub Actions running Verilator)
+- [x] Choose license (Apache-2.0)
+- [x] Set up CI skeleton (GitHub Actions running Verilator lint + testbench)
 
 ## Phase 1 — Skeleton CPU
 
 **Goal**: register file, fetch/decode, simplest ALU instructions running.
 
-- [ ] Top-level module, clock/reset, memory port stubs
-- [ ] Register file (32×32, r0 hardwired)
+- [x] Top-level module, clock/reset, memory port stubs (`rtl/v810.sv`)
+- [x] Register file (32×32, r0 hardwired) (`rtl/register_file.sv`)
+- [x] Register file testbench (`tb/tb_register_file.sv`)
 - [ ] Instruction fetch (no pipeline yet)
-- [ ] Decoder for arithmetic + logical register-register instructions
+- [ ] Decoder for arithmetic + logical register-register instructions (Format I)
 - [ ] Single-cycle ALU
-- [ ] Simple testbench + first passing trace
+- [ ] First passing end-to-end instruction trace (fetch → decode → execute → writeback)
 
 ## Phase 2 — Full integer ISA
 
-- [ ] All loads/stores with displacement
-- [ ] All branches + condition codes
-- [ ] Immediate-form instructions
+- [ ] All loads/stores with displacement (Format VI)
+- [ ] All branches + condition codes (Format III, IV)
+- [ ] Immediate-form instructions (Format II, V)
 - [ ] Sign/zero extension correct for all widths
 - [ ] PSW and condition-code flags
 - [ ] Sufficient test coverage for each instruction
